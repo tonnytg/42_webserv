@@ -6,6 +6,6 @@ This project is a simple webs server using socket, pool and cgi.
 
 - [RFC 7230](https://tools.ietf.org/html/rfc7230)
 
-## Installation
+## Test
 
-make
+curl -X GET -v localhost:8080/index.html
