@@ -42,6 +42,24 @@ void handle_connection(int new_socket) {
         }
 
         fclose(html_file);
+    } else if (strstr(buffer, "GET") != NULL && strstr(buffer, ".py") != NULL) {
+        // Se a requisição for para um script Python, executá-lo
+        FILE *script = popen("python cgi/hello.py", "r");
+        if (script == NULL) {
+            perror("Erro ao abrir script Python");
+            close(new_socket);
+            return;
+        }
+
+        char response_header[] = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\n";
+        send(new_socket, response_header, strlen(response_header), 0);
+
+        // Enviar a saída do script para o cliente
+        while (fgets(buffer, BUFFER_SIZE, script) != NULL) {
+            send(new_socket, buffer, strlen(buffer), 0);
+        }
+
+        pclose(script);
     } else {
         char response[] = "HTTP/1.1 404 Not Found\r\nContent-Length: 9\r\n\r\nNot Found";
         send(new_socket, response, strlen(response), 0);
